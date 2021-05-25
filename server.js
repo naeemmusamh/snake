@@ -3,21 +3,18 @@
 require('dotenv').config();
 const express = require('express');
 const app = express();
-const cors = require('cors');
 
 const ORIGIN = process.env.ORIGIN || 'https://snake-warz.herokuapp.com/';
-app.use(cors());
 app.use(express.static('./public'));
 
 const server = require('http').createServer(app);
 
-const io = require('socket.io')(server);
-// const io = require('socket.io')(server, {
-//   cors: {
-//     origin: ORIGIN, // 'https://ourapp-snake.io.heroku.com/'
-//     methods: ['GET', 'POST'],
-//   },
-// });
+const io = require('socket.io')(server, {
+  cors: {
+    origin: ORIGIN, // 'https://ourapp-snake.io.heroku.com/'
+    methods: ['GET', 'POST'],
+  },
+});
 
 const PORT = process.env.PORT || 3000;
 

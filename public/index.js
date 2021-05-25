@@ -1,7 +1,7 @@
 'use strict';
 
 // eslint-disable-next-line no-undef
-const socket = io.connect('https://snake-warz.herokuapp.com'); // 'http://localhost:3000'
+const socket = io.connect('https://snake-warz.herokuapp.com/'); // 'http://localhost:3000'
 
 socket.on('init', initHandler);
 socket.on('gameState', gameStateHandler);
