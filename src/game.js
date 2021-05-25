@@ -2,6 +2,12 @@
 /* eslint-disable indent */
 const { GRID_SIZE } = require('./constants');
 
+function initGame(){
+  const state = createGameState();
+  randomFood(state);
+  return state;
+}
+
 // gameState object
 function createGameState() {
   return {
@@ -114,7 +120,8 @@ function getUpdatedVelocity(keyCode) {
 
 
 module.exports = {
-  createGameState,
+  initGame,
   gameLoop,
-  getUpdatedVelocity
+  getUpdatedVelocity,
+
 };
