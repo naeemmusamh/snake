@@ -1,0 +1,66 @@
+:root {
+  --teal-light: #55ab9cff;
+  --teal-dark: #20555bff;
+  --purple-light: #d29beaff;
+  --purple-medium: #9753c5ff;
+  --purple-dark: #4e277dff;
+  --grey-light: #455765ff;
+  --grey-dark: #1a1d26ff;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body, html {
+  height: 100vh;
+  overflow: hidden;
+}
+
+header {
+  height: 5%;
+  background: var(--grey-dark);
+  color: var(--grey-light);
+}
+
+main {
+  height: 90%;
+  background: var(--grey-light);
+  color: var(--grey-light);
+
+  display: grid;
+  grid-template: 1fr 4fr 1fr / 1fr 4fr 1fr;
+  place-items: center;
+}
+
+  #initial-screen {
+    grid-area: 1 / 2;
+    text-align: center;
+  }
+    .form {
+      display: grid;
+      place-items: center;
+    }
+
+  #game-screen {
+    grid-area: 2 / 2;
+    width: 100%;
+    height: 100%;
+  }
+    #canvas-container {
+      display: grid;
+      place-items: center;
+      width: 100%;
+      height: 100%;
+    }
+      #canvas {
+        background: var(--grey-dark);
+        /* width: 100%;
+        height: 100%; */
+      }
+
+footer {
+  height: 5%;
+  background: var(--grey-dark);
+  color: var(--grey-light);
+}
