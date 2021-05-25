@@ -1,8 +1,7 @@
-/* eslint-disable no-unused-vars */
 'use strict';
 
 // eslint-disable-next-line no-undef
-const socket = io.connect('http://localhost:3000');
+const socket = io.connect('https://snake-warz.herokuapp.com/'); // 'http://localhost:3000'
 
 socket.on('init', initHandler);
 socket.on('gameState', gameStateHandler);
@@ -22,26 +21,26 @@ const joinGameBtn = document.getElementById('join-game-button');
 const gameCodeInput = document.getElementById('game-code-input');
 const gameCodeDisplay = document.getElementById('game-code-display');
 
-newGameBtn.addEventListener('click',newGame);
-joinGameBtn.addEventListener('click',joinGame);
-function newGame(event){
+newGameBtn.addEventListener('click', newGame);
+joinGameBtn.addEventListener('click', joinGame);
+
+function newGame(event) {
   event.preventDefault();
-  
+
   socket.emit('newGame');
   init();
 }
-function joinGame(event){
+function joinGame(event) {
   event.preventDefault();
-  const code=gameCodeInput.value;
-  socket.emit('joinGame',code);
+  const code = gameCodeInput.value;
+  socket.emit('joinGame', code);
   init();
-
 }
 
 // global variables
 let canvas, ctx;
 let playerNumber;
-let gameActive=false;
+let gameActive = false;
 
 function init() {
   canvas = document.getElementById('canvas');
@@ -53,7 +52,7 @@ function init() {
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 
   document.addEventListener('keydown', keydown);
-  gameActive=true;
+  gameActive = true;
 }
 
 // keydown INPUT
@@ -88,11 +87,11 @@ function paintPlayer(playerState, size, color) {
 
 // socket function
 function initHandler(payload) {
-  playerNumber=payload; 
+  playerNumber = payload;
 }
 
 function gameStateHandler(gameState) {
-  if(!gameActive){
+  if (!gameActive) {
     return;
   }
   gameState = JSON.parse(gameState);
@@ -100,31 +99,35 @@ function gameStateHandler(gameState) {
 }
 
 function gameOverHandler(gameState) {
-  if(!gameActive){
+  if (!gameActive) {
     return;
   }
-  gameState=JSON.parse(gameState);
-  if(gameState.winner === playerNumber){
+
+  gameState = JSON.parse(gameState);
+  if (gameState.winner === playerNumber) {
     alert('you win ');
-  }else{
+  } else {
     alert('you lose');
   }
-  gameActive=false;
+  gameActive = false;
 }
-function gameCodeHandler(gameCode){
-  gameCodeDisplay.innerHTML=gameCode;
+
+function gameCodeHandler(gameCode) {
+  gameCodeDisplay.innerText = gameCode;
 }
-function unknownGameHandler(){
+
+function unknownGameHandler() {
   reset();
   alert('unknown game code');
 }
-function tooManyPlayersHandler(){
+
+function tooManyPlayersHandler() {
   reset();
   alert('game in progress');
-
 }
-function reset(){
-  playerNumber=null;
-  gameCodeInput.value='';
-  gameCodeDisplay.innerText='';
+
+function reset() {
+  playerNumber = null;
+  gameCodeInput.value = '';
+  gameCodeDisplay.innerText = '';
 }

@@ -1,72 +1,77 @@
 'use strict';
 
+require('dotenv').config();
 const app = require('express')();
 const server = require('http').createServer(app);
 
+const ORIGIN = process.env.ORIGIN || 'https://snake-warz.herokuapp.com/';
+
 const io = require('socket.io')(server, {
   cors: {
-    origin: 'http://127.0.0.1:5501',
+    origin: ORIGIN, // 'https://ourapp-snake.io.heroku.com/'
     methods: ['GET', 'POST'],
   },
 });
 
 const PORT = process.env.PORT || 3000;
 
-const { createGameState, gameLoop, getUpdatedVelocity, initGame } = require('./src/game');
-const {makeId} =require('./utils');
+const { gameLoop, getUpdatedVelocity, initGame } = require('./src/game');
+const { makeId } = require('./src/utils');
 const { FRAME_RATE } = require('./src/constants');
-const { emit } = require('process');
+// const { emit } = require('process');
 
-const state={};
-const clientRooms={};
+const state = {};
+const clientRooms = {};
 io.on('connection', (client) => {
-  
+  console.log('CLIENT ID ::::::', client.id);
   client.on('keydown', keydownHandler);
   client.on('newGame', handleNewGame);
   client.on('joinGame', handleJoinGame);
 
-  function handleJoinGame(gameCode){
-    const room =io.sockets.adapter.rooms[gameCode];
+  function handleJoinGame(gameCode) {
+    const room = io.sockets.adapter.rooms.get(gameCode);
     let allUsers;
-    if(room){
-      allUsers=room.sockets;
+    if (room) {
+      allUsers = room.size; // room.sockets
     }
-    let numClients=0;
-    if(allUsers){
-      numClients=Object.keys(allUsers).length;
-    }
-    if(numClients===0){
+
+    let numClients = allUsers; // let numClients = 0; 
+    // if (allUsers) {
+    //   numClients = Object.keys(allUsers).length;
+    // }
+
+    if (numClients === 0) {
       client.emit('unknownGame');
       return;
-    }else if(numClients>1){
+    } else if (numClients > 1) {
       client.emit('tooManyPlayers');
       return;
     }
 
-    clientRooms[client.id]=gameCode;
+    clientRooms[client.id] = gameCode;
     client.join(gameCode);
-    client.number=2;
-    client.emit('init',2);
+    client.number = 2;
+    client.emit('init', 2);
 
     startGameInterval(gameCode);
   }
-  
-  function handleNewGame(){
-    let roomName=makeId(5); 
-    clientRooms[client.id]=roomName;
-    client.emit('gameCode',roomName);
+
+  function handleNewGame() {
+    let roomName = makeId(5);
+    clientRooms[client.id] = roomName;
+    client.emit('gameCode', roomName);
     state[roomName] = initGame();
 
     client.join(roomName);
-    client.number=1;
-    client.emit('init',1);
+    client.number = 1;
+    client.emit('init', 1);
   }
 
   // we are defining the function here to access
   // ... the client object, this is the easiest way right now
   function keydownHandler(keyCode) {
-    const roomName=clientRooms[client.id];
-    if(!roomName){
+    const roomName = clientRooms[client.id];
+    if (!roomName) {
       return;
     }
     try {
@@ -79,11 +84,9 @@ io.on('connection', (client) => {
     const vel = getUpdatedVelocity(keyCode);
 
     if (vel) {
-      state[roomName].players[client.number - 1].vel=vel ;
-     
+      state[roomName].players[client.number - 1].vel = vel;
     }
   }
-
 });
 
 function startGameInterval(roomName) {
@@ -93,23 +96,20 @@ function startGameInterval(roomName) {
 
     // !winner == game is not finished yet
     if (!winner) {
-      emitGameState(roomName,state[roomName]);
-
+      emitGameState(roomName, state[roomName]);
     } else {
-      emitGameOver(roomName,winner);
-      state[roomName]=null;
+      emitGameOver(roomName, winner);
+      state[roomName] = null;
       clearInterval(intervalId);
     }
   }, 1000 / FRAME_RATE);
 }
 
-function emitGameState(roomName,state){
-  io.sockets.in(roomName)
-    .emit('gameState',JSON.stringify(state));
+function emitGameState(roomName, state) {
+  io.sockets.in(roomName).emit('gameState', JSON.stringify(state));
 }
-function emitGameOver(roomName,winner){
-  io.sockets.in(roomName)
-    .emit('gameOver',JSON.stringify({ winner }));
+function emitGameOver(roomName, winner) {
+  io.sockets.in(roomName).emit('gameOver', JSON.stringify({ winner }));
 }
 
 server.listen(PORT, () => {

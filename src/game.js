@@ -1,9 +1,8 @@
-/* eslint-disable no-unused-vars */
 /* eslint-disable comma-dangle */
 /* eslint-disable indent */
 const { GRID_SIZE } = require('./constants');
 
-function initGame(){
+function initGame() {
   const state = createGameState();
   randomFood(state);
   return state;
@@ -12,35 +11,38 @@ function initGame(){
 // gameState object
 function createGameState() {
   return {
-    players: [{
-      pos: {
-        x: 3,
-        y: 10
+    players: [
+      {
+        pos: {
+          x: 3,
+          y: 10
+        },
+        vel: {
+          x: 0,
+          y: 0
+        },
+        snake: [
+          { x: 1, y: 10 },
+          { x: 2, y: 10 },
+          { x: 3, y: 10 }
+        ]
       },
-      vel: {
-        x: 1,
-        y: 0
-      },
-      snake: [
-        { x: 1, y: 10 },
-        { x: 2, y: 10 },
-        { x: 3, y: 10 }
-      ]
-    },{
-      pos: {
-        x: 18,
-        y: 10
-      },
-      vel: {
-        x: 0,
-        y: 0
-      },
-      snake: [
-        { x: 20, y: 10 },
-        { x: 19, y: 10 },
-        { x: 18, y: 10 }
-      ]
-    }],
+      {
+        pos: {
+          x: 18,
+          y: 10
+        },
+        vel: {
+          x: 0,
+          y: 0
+        },
+        snake: [
+          { x: 20, y: 10 },
+          { x: 19, y: 10 },
+          { x: 18, y: 10 }
+        ]
+      }
+    ],
     food: {},
     gridSize: GRID_SIZE
   };
@@ -53,8 +55,6 @@ function gameLoop(state) {
 
   const playerOne = state.players[0];
   const playerTwo = state.players[1];
-
-
 
   playerOne.pos.x += playerOne.vel.x;
   playerOne.pos.y += playerOne.vel.y;
@@ -102,7 +102,6 @@ function gameLoop(state) {
     randomFood(state);
   }
 
-
   // moving the snake
   if (playerOne.vel.x || playerOne.vel.y) {
     // make sure it didn't bump into itself
@@ -116,19 +115,19 @@ function gameLoop(state) {
     playerOne.snake.push({ ...playerOne.pos });
     playerOne.snake.shift();
   }
-// moving the snake
-if (playerTwo.vel.x || playerTwo.vel.y) {
-  // make sure it didn't bump into itself
-  for (let cell of playerTwo.snake) {
-    if (cell.x === playerTwo.pos.x && cell.y === playerTwo.pos.y) {
-      return 1;
+  // moving the snake
+  if (playerTwo.vel.x || playerTwo.vel.y) {
+    // make sure it didn't bump into itself
+    for (let cell of playerTwo.snake) {
+      if (cell.x === playerTwo.pos.x && cell.y === playerTwo.pos.y) {
+        return 1;
+      }
     }
-  }
 
-  // move snake
-  playerTwo.snake.push({ ...playerTwo.pos });
-  playerTwo.snake.shift();
-}
+    // move snake
+    playerTwo.snake.push({ ...playerTwo.pos });
+    playerTwo.snake.shift();
+  }
   // game continues, no winner
   return false;
 }
@@ -146,38 +145,40 @@ function randomFood(state) {
       return randomFood(state);
     }
   }
-    // make sure food is not placed on top of a snake cell
-    for (let cell of state.players[1].snake) {
-      if (cell.x === food.x && cell.y === food.y) {
-        // recursively call the same function
-        return randomFood(state);
-      }
+  // make sure food is not placed on top of a snake cell
+  for (let cell of state.players[1].snake) {
+    if (cell.x === food.x && cell.y === food.y) {
+      // recursively call the same function
+      return randomFood(state);
     }
+  }
 
   state.food = food;
 }
 
 function getUpdatedVelocity(keyCode) {
   switch (keyCode) {
-    case 37: { // left
+    case 37: {
+      // left
       return { x: -1, y: 0 };
     }
-    case 38: { // up
+    case 38: {
+      // up
       return { x: 0, y: -1 };
     }
-    case 39: { // right
+    case 39: {
+      // right
       return { x: 1, y: 0 };
     }
-    case 40: { // down
+    case 40: {
+      // down
       return { x: 0, y: 1 };
     }
   }
 }
 
-
 module.exports = {
   initGame,
   gameLoop,
-  getUpdatedVelocity,
-
+  getUpdatedVelocity
 };
