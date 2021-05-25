@@ -6,15 +6,37 @@ const socket = io.connect('http://localhost:3000');
 socket.on('init', initHandler);
 socket.on('gameState', gameStateHandler);
 socket.on('gameOver', gameOverHandler);
+socket.on('gameCode', gameCodeHandler);
+socket.on('unknownGame', unknownGameHandler);
+socket.on('tooManyPlayers', tooManyPlayersHandler);
 
 const BG_COLOR = '#231f20';
 const SNAKE_COLOR = '#c2c2c2';
 const FOOD_COLOR = '#e66916';
 
 const gameScreen = document.getElementById('game-screen');
+const initialScreen = document.getElementById('initial-screen');
+const newGameBtn = document.getElementById('new-game-button');
+const joinGameBtn = document.getElementById('join-game-button');
+const gameCodeInput = document.getElementById('game-code-input');
+const gameCodeDisplay = document.getElementById('game-code-display');
+
+newGameBtn.addEventListener('click',newGame);
+joinGameBtn.addEventListener('click',joinGame);
+function newGame(){
+  socket.emit('newGame');
+  init();
+}
+function joinGame(){
+  const code=gameCodeInput.value;
+  socket.emit('joinGame',code);
+  init();
+
+}
 
 // global variables
 let canvas, ctx;
+let playerNumber;
 
 function init() {
   canvas = document.getElementById('canvas');
@@ -27,7 +49,6 @@ function init() {
 
   document.addEventListener('keydown', keydown);
 }
-init();
 
 // keydown INPUT
 function keydown(e) {
@@ -60,7 +81,7 @@ function paintPlayer(playerState, size, color) {
 
 // socket function
 function initHandler(payload) {
-  console.log(payload);
+  playerNumber=payload; 
 }
 
 function gameStateHandler(gameState) {
@@ -70,4 +91,21 @@ function gameStateHandler(gameState) {
 
 function gameOverHandler(gameState) {
   alert('you lose');
+}
+function gameCodeHandler(gameCode){
+  gameCodeDisplay.innerHTML=gameCode;
+}
+function unknownGameHandler(){
+  reset();
+  alert('unknown game code');
+}
+function tooManyPlayersHandler(){
+  reset();
+  alert('game in progress');
+
+}
+function reset(){
+  playerNumber=null;
+  gameCodeInput.value='';
+  gameCodeDisplay.innerText='';
 }
