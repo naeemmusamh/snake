@@ -1,10 +1,13 @@
 'use strict';
 
 require('dotenv').config();
-const app = require('express')();
-const server = require('http').createServer(app);
+const express = require('express');
+const app = express();
 
 const ORIGIN = process.env.ORIGIN || 'https://snake-warz.herokuapp.com/';
+app.use(express.static('./public'));
+
+const server = require('http').createServer(app);
 
 const io = require('socket.io')(server, {
   cors: {
