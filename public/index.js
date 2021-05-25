@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 'use strict';
 
 // eslint-disable-next-line no-undef
@@ -23,11 +24,14 @@ const gameCodeDisplay = document.getElementById('game-code-display');
 
 newGameBtn.addEventListener('click',newGame);
 joinGameBtn.addEventListener('click',joinGame);
-function newGame(){
+function newGame(event){
+  event.preventDefault();
+  
   socket.emit('newGame');
   init();
 }
-function joinGame(){
+function joinGame(event){
+  event.preventDefault();
   const code=gameCodeInput.value;
   socket.emit('joinGame',code);
   init();
@@ -37,6 +41,7 @@ function joinGame(){
 // global variables
 let canvas, ctx;
 let playerNumber;
+let gameActive=false;
 
 function init() {
   canvas = document.getElementById('canvas');
@@ -48,6 +53,7 @@ function init() {
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 
   document.addEventListener('keydown', keydown);
+  gameActive=true;
 }
 
 // keydown INPUT
@@ -67,7 +73,8 @@ function paintGame(state) {
   ctx.fillStyle = FOOD_COLOR;
   ctx.fillRect(food.x * size, food.y * size, size, size);
 
-  paintPlayer(state.player, size, SNAKE_COLOR);
+  paintPlayer(state.players[0], size, SNAKE_COLOR);
+  paintPlayer(state.players[1], size, 'red');
 }
 
 function paintPlayer(playerState, size, color) {
@@ -85,12 +92,24 @@ function initHandler(payload) {
 }
 
 function gameStateHandler(gameState) {
+  if(!gameActive){
+    return;
+  }
   gameState = JSON.parse(gameState);
   requestAnimationFrame(() => paintGame(gameState));
 }
 
 function gameOverHandler(gameState) {
-  alert('you lose');
+  if(!gameActive){
+    return;
+  }
+  gameState=JSON.parse(gameState);
+  if(gameState.winner === playerNumber){
+    alert('you win ');
+  }else{
+    alert('you lose');
+  }
+  gameActive=false;
 }
 function gameCodeHandler(gameCode){
   gameCodeDisplay.innerHTML=gameCode;

@@ -65,6 +65,10 @@ io.on('connection', (client) => {
   // we are defining the function here to access
   // ... the client object, this is the easiest way right now
   function keydownHandler(keyCode) {
+    const roomName=clientRooms[client.id];
+    if(!roomName){
+      return;
+    }
     try {
       keyCode = parseInt(keyCode);
     } catch (e) {
@@ -74,11 +78,9 @@ io.on('connection', (client) => {
 
     const vel = getUpdatedVelocity(keyCode);
 
-    if (
-      vel &&
-      (state.player.vel.x !== (vel.x * -1) || state.player.vel.y !== (vel.y * -1))
-    ) {
-      state.player.vel = vel;
+    if (vel) {
+      state[roomName].players[client.number - 1].vel=vel ;
+     
     }
   }
 
